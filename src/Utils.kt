@@ -6,7 +6,12 @@ import kotlin.io.path.readLines
 /**
  * Reads lines from the given input txt file.
  */
-fun readInput(day: String, name: String) = Path("src/$day/$name.txt").readLines()
+fun readInput(day: String) = Path("src/$day/${day.capitalize()}.txt").readLines()
+
+/**
+ * Reads lines from the given test input txt file.
+ */
+fun readTestInput(day: String, part: String?) = Path("src/$day/${day.capitalize()}_${part}_test.txt").readLines()
 
 /**
  * Converts string to md5 hash.
