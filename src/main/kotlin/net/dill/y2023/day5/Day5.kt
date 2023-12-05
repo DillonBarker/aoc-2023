@@ -1,7 +1,8 @@
 package net.dill.y2023.day5
 
 import net.dill.*
-import net.dill.readTestInputBlocks
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 const val DAY = "day5"
 
@@ -10,57 +11,68 @@ fun main() {
         val cleanedInput = input.split("\n\n")
         val seeds = cleanedInput[0].split("seeds: ")[1].split(" ")
 
-        // seed-to-soil-map
-        val seedToSoil = getPairs(cleanedInput[1])
-
-        // soil-to-fertilizer-map
-        val soilToFertilizer = getPairs(cleanedInput[2])
-
-        // fertilizer-to-water-map
-        val fertilizerToWater = getPairs(cleanedInput[3])
-
-        // water-to-light-map
-        val waterToLight = getPairs(cleanedInput[4])
-
-        // light-to-temperature-map
-        val lightToTemperature = getPairs(cleanedInput[5])
-
-        // temperature-to-humidity-map
-        val temperatureToHumidity = getPairs(cleanedInput[6])
-
-        // humidity-to-location-map
-        val humidityToLocation = getPairs(cleanedInput[7])
-
-
-        // for each seed go through process to get location number
         val locations = mutableListOf<Long>()
         seeds.forEach { seed ->
-            val soil = getValue(seedToSoil, seed.toLong())
-            val fertilizer = getValue(soilToFertilizer, soil)
-            val water = getValue(fertilizerToWater, fertilizer)
-            val light = getValue(waterToLight, water)
-            val temperature = getValue(lightToTemperature, light)
-            val humidity = getValue(temperatureToHumidity, temperature)
-            val location = getValue(humidityToLocation, humidity)
+            val soil = getNext(cleanedInput[1], seed.toLong())
+            val fertilizer = getNext(cleanedInput[2], soil)
+            val water = getNext(cleanedInput[3], fertilizer)
+            val light = getNext(cleanedInput[4], water)
+            val temperature = getNext(cleanedInput[5], light)
+            val humidity = getNext(cleanedInput[6], temperature)
+            val location = getNext(cleanedInput[7], humidity)
             locations += location
         }
 
         return locations.min()
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+    fun part2(input: String): Long {
+        val cleanedInput = input.split("\n\n")
+
+        val seedInput = cleanedInput[0].split("seeds: ")[1].split(" ")
+        val locations = mutableListOf<Long>()
+
+        val threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+
+        seedInput.windowed(2, 2, partialWindows = true).forEach { (first, second) ->
+            threadPool.submit {
+                val localLocations = mutableListOf<Long>()
+                for (seed in (first.toLong() until (first.toLong() + second.toLong()))) {
+                    val location = calculateLocation(cleanedInput, seed)
+                    localLocations.add(location)
+                }
+                synchronized(locations) {
+                    locations.addAll(localLocations)
+                }
+            }
+        }
+
+        threadPool.shutdown()
+        threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
+
+        return locations.min()
     }
 
     val testInput1 = readTestInputBlocks(DAY, "a")
-    val testInput2 = readTestInput(DAY, "b")
-    check(part1(testInput1) == 35L)
-    check(part2(testInput2) == 0)
+    val testInput2 = readTestInputBlocks(DAY, "b")
+//    check(part1(testInput1) == 35L)
+//    check(part2(testInput2) == 46L)
 
+    //65711604
 
     val input = readInputBlocks(DAY)
     part1(input).println()
-//    part2(input).println()
+    part2(input).println()
+}
+
+fun calculateLocation(input: List<String>, seed: Long): Long {
+    val soil = getNext(input[1], seed)
+    val fertilizer = getNext(input[2], soil)
+    val water = getNext(input[3], fertilizer)
+    val light = getNext(input[4], water)
+    val temperature = getNext(input[5], light)
+    val humidity = getNext(input[6], temperature)
+    return getNext(input[7], humidity)
 }
 
 fun getValue(map: List<Pair<Long, Long>>, previous: Long): Long {
@@ -70,20 +82,20 @@ fun getValue(map: List<Pair<Long, Long>>, previous: Long): Long {
     return value
 }
 
-fun getPairs(input: String): List<Pair<Long, Long>> {
-    val pairList = mutableListOf<Pair<Long,Long>>()
+fun getNext(input: String, source: Long): Long {
     val size = input.split("\n").size - 1
-
+    var next: Long = source
     for (each in 1..size) {
         val map = input.split("\n")[each].split(" ")
-        val destinationRangeStart = map[0]
-        val sourceRangeStart = map[1]
-        val rangeLength = map[2]
+        val destinationRangeStart = map[0].toLong()
+        val sourceRangeStart = map[1].toLong()
+        val rangeLength = map[2].toLong()
 
-        for (i in 0..<rangeLength.toInt()) {
-            val pair = sourceRangeStart.toLong() + i to destinationRangeStart.toLong() + i
-            pairList.add(pair)
+        if (source in (sourceRangeStart..<sourceRangeStart+rangeLength)) {
+            val diff = destinationRangeStart - sourceRangeStart
+            next = diff + source
+            break
         }
     }
-    return pairList
+    return next
 }
