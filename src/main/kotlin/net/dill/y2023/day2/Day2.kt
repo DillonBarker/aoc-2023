@@ -1,8 +1,8 @@
-package day2
+package net.dill.y2023.day2
 
-import println
-import readInput
-import readTestInput
+import net.dill.println
+import net.dill.readInput
+import net.dill.readTestInput
 
 const val DAY = "day2"
 

@@ -1,8 +1,8 @@
-package day4
+package net.dill.y2023.day4
 
-import println
-import readInput
-import readTestInput
+import net.dill.println
+import net.dill.readInput
+import net.dill.readTestInput
 
 const val DAY = "day4"
 
@@ -48,11 +48,10 @@ fun main() {
                 }
             }
 
-            for (i in id..<id+winners) {
-                val copies = scratchCards[id-1]
+            for (i in id..< id + winners) {
+                val copies = scratchCards[id - 1]
                 scratchCards[i] += 1 * copies
             }
-
         }
 
         return scratchCards.sum()

@@ -8,10 +8,11 @@ fi
 
 # Get the day number from the command line argument
 day_number=$1
+year=2023
 
 # Define source and destination directories
-src_dir="src"
-template_dir="src/template"
+src_dir="src/main/kotlin/net/dill/y$year"
+template_dir="src/main/kotlin/net/dill/template"
 day_dir="$src_dir/day$day_number"
 kt_file="$day_dir/Day${day_number}.kt"
 
@@ -27,7 +28,7 @@ cp "$template_dir/DayX.kt" "$kt_file"
 # Replace "X" with the day number in the .kt file
 sed -i "s/DAY = \"dayX\"/DAY = \"day${day_number}\"/" "$kt_file"
 # Replace "template" with the day number in the .kt file
-sed -i "s/package template/package day${day_number}/" "$kt_file"
+sed -i "s/package net.dill.template/package net.dill.template.y${year}.day${day_number}/" "$kt_file"
 
 # Display success message
 echo "day$day_number folder created with template files in $src_dir."
