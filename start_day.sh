@@ -28,7 +28,7 @@ cp "$template_dir/DayX.kt" "$kt_file"
 # Replace "X" with the day number in the .kt file
 sed -i "s/DAY = \"dayX\"/DAY = \"day${day_number}\"/" "$kt_file"
 # Replace "template" with the day number in the .kt file
-sed -i "s/package net.dill.template/package net.dill.template.y${year}.day${day_number}/" "$kt_file"
+sed -i "s/package net.dill.template/package net.dill.y${year}.day${day_number}/" "$kt_file"
 
 # Display success message
 echo "day$day_number folder created with template files in $src_dir."

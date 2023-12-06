@@ -32,23 +32,22 @@ fun main() {
         val seedInput = cleanedInput[0].split("seeds: ")[1].split(" ")
         val locations = mutableListOf<Long>()
 
-        val threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+        val seedMap = mutableListOf<LongRange>()
+        seedInput.windowed(2, 2, partialWindows = true).forEach { (first, second) ->
+            seedMap.add(first.toLong()..first.toLong()+second.toLong())
+        }
+        println(seedMap)
 
         seedInput.windowed(2, 2, partialWindows = true).forEach { (first, second) ->
-            threadPool.submit {
-                val localLocations = mutableListOf<Long>()
-                for (seed in (first.toLong() until (first.toLong() + second.toLong()))) {
-                    val location = calculateLocation(cleanedInput, seed)
-                    localLocations.add(location)
-                }
-                synchronized(locations) {
-                    locations.addAll(localLocations)
-                }
+            val localLocations = mutableListOf<Long>()
+            for (seed in (first.toLong() until (first.toLong() + second.toLong()))) {
+                val location = calculateLocation(cleanedInput, seed)
+                localLocations.add(location)
+            }
+            synchronized(locations) {
+                locations.addAll(localLocations)
             }
         }
-
-        threadPool.shutdown()
-        threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
 
         return locations.min()
     }
@@ -56,12 +55,12 @@ fun main() {
     val testInput1 = readTestInputBlocks(DAY, "a")
     val testInput2 = readTestInputBlocks(DAY, "b")
 //    check(part1(testInput1) == 35L)
-//    check(part2(testInput2) == 46L)
+    check(part2(testInput2) == 46L)
 
     //65711604
 
     val input = readInputBlocks(DAY)
-    part1(input).println()
+//    part1(input).println()
     part2(input).println()
 }
 
