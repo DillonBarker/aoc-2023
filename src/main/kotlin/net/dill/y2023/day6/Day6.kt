@@ -51,9 +51,7 @@ fun main() {
     part2(input).println()
 }
 
-// found a quadratic eq to do the maths!
 fun calculateResult(time: Long, distance: Long): Long {
     val firstWin = ceil((time + sqrt(time.toDouble() * time - 4 * (distance + 1.0))) / 2).toLong()
     return (time - 2 * firstWin + 1).absoluteValue
 }
-

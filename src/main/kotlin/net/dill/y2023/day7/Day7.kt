@@ -6,16 +6,16 @@ import net.dill.readTestInput
 
 const val DAY = "day7"
 
-fun main() {
+// Didn't solve this one myself, worked with solution online to help me solve - need to retry with my own solution.
 
+fun main() {
     data class Hand(val cards: List<Int>, val groups: List<Int>, val bid: Int)
 
     fun part1(input: List<String>): Int {
         val values = listOf('T', 'J', 'Q', 'K', 'A')
 
         val result = input.asSequence().map { it.split(" ") }.map { (hand, bid) ->
-                val cards =
-                    hand.map { card -> values.indexOf(card).let { if (it > -1) it + 10 else card.digitToInt() } }
+                val cards = hand.map { card -> values.indexOf(card).let { if (it > -1) it + 10 else card.digitToInt() } }
                 val groups = cards.groupBy { it }.map { it.value.size }.sortedByDescending { it }
                 Hand(cards, groups, bid.toInt())
             }
